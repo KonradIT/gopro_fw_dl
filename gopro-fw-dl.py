@@ -1,11 +1,15 @@
-import urllib.request
-import urllib
-import json
+from __future__ import print_function
 import html2text
 import requests
 import sys
 import os
 import zipfile
+
+try:
+	input = raw_input
+except NameError:
+	pass
+
 #Parameters: Change these!
 SD_CARD_PATH="/run/media/konrad/GoPro" #Necessary, path of your mounted SD card in order to autoflash the firmware into the SD card. Camera USB not supported in HERO3+/4/5/HERO+. Only HERO3 and HERO2 (with non-MTP/PTP mount points)
 CONFIRM_DL = True #Ask to confirm download, turn off for automatically downloading after selecting camera. This is useful for automation when used with arguments.
@@ -20,7 +24,6 @@ def get_camera_json(json, camera_choice):
 			fw_filename=cam['model_string'] + "_" + fw_version + "_" + fw_releasedate + ".zip"
 			print("FW Version: " + fw_version + " FW Release Date: " + fw_releasedate)
 			print(html2text.html2text(fw_release_notes))
-			DOWNLOAD_CONFIRM="N"
 			if(CONFIRM_DL == True):
 				choice_dl=input("Do you want to download the firmware to the current working directory? [Y/N]: ")
 				if(choice_dl.upper() == "N"):
@@ -64,16 +67,14 @@ if(len(sys.argv) >= 2):
 		print("Usage: gopro_fw_dl.py [camera id]\nCamera ID is usually HXX.XX, for example HD3.22, to get the supported camera ids, run the script without any arguments.\nGitHub: http://github.com/konradit/gopro_fw_dl\nReport an issue: http://github.com/konradit/gopro_fw_dl/issues")
 	else:
 		print("Parsing camera.... " + str(sys.argv[1]).upper())
-		raw_json=urllib.request.urlopen("https://firmware-api.gopro.com/v2/firmware/catalog").read()
-		json_data=json.loads(raw_json)
+		json_data=requests.get("https://firmware-api.gopro.com/v2/firmware/catalog").json()
 		camera_choice=str(sys.argv[1]).upper()
 		get_camera_json(json_data, camera_choice)
 		
 		
 else:
 	print("Choose your camera: ")
-	raw_json=urllib.request.urlopen("https://firmware-api.gopro.com/v2/firmware/catalog").read()
-	json_data=json.loads(raw_json)
+	json_data=requests.get("https://firmware-api.gopro.com/v2/firmware/catalog").json()
 	for cam in json_data['cameras']:
 		target_cam = cam['model_string']
 		target_cam_name = cam['name']

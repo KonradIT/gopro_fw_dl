@@ -6,4 +6,12 @@ Firmware backups for downgrade: http://drivers.softpedia.com/get/SCANNER-Digital
 
 ## Usage:
 
+For Linux users:
+
+./download-firmware.sh
+
+Otherwise:
+
+> *must* have contents of `requirements.lock` installed
+
 python3 gopro-fw-dl.py
